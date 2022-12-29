@@ -1,4 +1,4 @@
-package de.hechler.encrypt.cloudbackup.pcloud;
+package de.hechler.encrypt.cloudbackup;
 
 import java.nio.file.Paths;
 
@@ -10,6 +10,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import de.hechler.encrypt.cloudbackup.pcloud.PCloudApiClient;
+import de.hechler.encrypt.cloudbackup.pcloud.PCloudConfig;
 import de.hechler.encrypt.utils.Utils;
 
 /**

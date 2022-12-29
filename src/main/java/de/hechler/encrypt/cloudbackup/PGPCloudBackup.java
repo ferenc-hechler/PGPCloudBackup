@@ -1,4 +1,4 @@
-package de.hechler.encrypt.cloudbackup.pcloud;
+package de.hechler.encrypt.cloudbackup;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,6 +9,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import de.hechler.encrypt.cloudbackup.pcloud.PCloudDeleter;
+import de.hechler.encrypt.cloudbackup.pcloud.PCloudHashReader;
+import de.hechler.encrypt.cloudbackup.pcloud.PCloudUploader;
 import de.hechler.encrypt.pgp.Encrypter;
 import de.hechler.encrypt.utils.Utils;
 
