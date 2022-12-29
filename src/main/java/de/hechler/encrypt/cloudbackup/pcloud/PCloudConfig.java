@@ -48,11 +48,15 @@ public class PCloudConfig {
 			if (encClientSecret == null) {
 				encClientSecret = SimpleCrypto.encrypt(APP_NAME + 13, envProps.getProperty("CLIENT_SECRET").trim());
 				System.out.println("ENC_CLIENT_SECRET=" + encClientSecret);
+				System.out.println("--> replace CLIENT_SECRET=... with the above line in "+propertiesFile);
+				System.exit(2);
 			}
 			encAccessToken = envProps.getProperty("ENC_ACCESS_TOKEN");
 			if (encAccessToken == null) {
 				encAccessToken = SimpleCrypto.encrypt(APP_NAME + 13, envProps.getProperty("ACCESS_TOKEN").trim());
 				System.out.println("ENC_ACCESS_TOKEN=" + encAccessToken);
+				System.out.println("--> replace ACCESS_TOKEN=... with the above line in "+propertiesFile);
+				System.exit(2);
 			}
 			apiHost = envProps.getProperty("API_HOST").trim();
 		} catch (Exception e) {
