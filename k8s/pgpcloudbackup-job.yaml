@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pgpcloudbackup-cronjob
+spec:
+      template:
+        spec:
+          containers:
+          - name: pgpcloudbackup
+            image: feridock/pgpcloudbackup:0.1
+            command: [ "/bin/sh", "-c", "--" ]
+            args: [ "echo waiting 1h;
+            sleep 3600;
+            echo finished"]
+            imagePullPolicy: IfNotPresent
+            env:
+            - name: PGPCB_CONFIG_FILE
+              value: "/app/conf/.pcloud-config"
+            - name: PGPCB_PUBLIC_PGP_KEY_FILE
+              value: "/app/conf/encrypt-key.pub"
+            - name: PGPCB_LOCAL_FOLDER
+              value: "/input"
+            - name: PGPCB_TEMP_FOLDER
+              value: "/tmp"
+            - name: PGPCB_REMOTE_FOLDER
+              value: "/VSERVERBACKUP/mc-forge-1-12"
+            volumeMounts:
+            - mountPath: /input
+              name: input
+            - name: config
+              mountPath: "/app/conf"
+              readOnly: true
+          volumes:
+          - name: input
+            persistentVolumeClaim:
+              claimName: pgpcloudbackup-pvc
+          - name: config
+            secret:
+              secretName: pgpcloudbackup-secret
+          restartPolicy: Never
+      backoffLimit: 3
