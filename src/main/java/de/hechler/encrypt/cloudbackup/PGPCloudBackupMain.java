@@ -21,18 +21,13 @@ import de.hechler.encrypt.utils.Utils;
 
 public class PGPCloudBackupMain {
 
-	private static String DEFAULT_CONFIG = "conf/.pcloud-config";
-	private static String DEFAULT_KEY = "conf/encrypt-key.pub";
-	private static String DEFAULT_FOLDER = "/input";
-	private static String DEFAULT_TEMP_FOLDER = System.getProperty("java.io.tmpdir");
-	private static String DEFAULT_REMOTE_FOLDER = "/VSERVERBACKUP/TEST";
+	static String DEFAULT_CONFIG = "conf/.pcloud-config";
+	static String DEFAULT_KEY = "conf/encrypt-key.pub";
+	static String DEFAULT_FOLDER = "/input";
+	static String DEFAULT_TEMP_FOLDER = System.getProperty("java.io.tmpdir");
+	static String DEFAULT_REMOTE_FOLDER = "/VSERVERBACKUP/TEST";
+	static boolean DEFAULT_DELETE_REMOTE = false;
 
-//	private static String DEFAULT_CONFIG = "DONOTCHECKIN/.pcloud-config";
-//	private static String DEFAULT_KEY = "encrypt-key.pub";
-//	private static String DEFAULT_FOLDER = "./testdata";
-//	private static String DEFAULT_TEMP_FOLDER = System.getProperty("java.io.tmpdir");
-//	private static String DEFAULT_REMOTE_FOLDER = "/VSERVERBACKUP/TEST";
-	
 	public static void main(String[] args) {
 		try {
 	        CommandLine cmd = null;
@@ -57,7 +52,11 @@ public class PGPCloudBackupMain {
 		        Option remoteFolderOpt = new Option("r", "remote-folder", true, "target pCloud folder for backup, default is \""+DEFAULT_REMOTE_FOLDER+"\"");
 		        remoteFolderOpt.setRequired(false);
 		        options.addOption(remoteFolderOpt);
-		    	
+
+		        Option deleteRemoteOpt = new Option("d", "delete-remote", false, "delet remote files, which were deleted locally");
+		        deleteRemoteOpt.setRequired(false);
+		        options.addOption(deleteRemoteOpt);
+
 		        CommandLineParser parser = new DefaultParser();
 		        cmd = parser.parse(options, args);
 	        } catch (ParseException e) {
@@ -72,17 +71,19 @@ public class PGPCloudBackupMain {
 	        String folder       = getValue(cmd, "folder",        "PGPCB_LOCAL_FOLDER",        DEFAULT_FOLDER);
 	        String tempFolder   = getValue(cmd, "temp-folder",   "PGPCB_TEMP_FOLDER",         DEFAULT_TEMP_FOLDER);
 	        String remoteFolder = getValue(cmd, "remote-folder", "PGPCB_REMOTE_FOLDER",       DEFAULT_REMOTE_FOLDER);
+	        boolean deleteRemote = getBooleanValue(cmd, "delete-remote", "PGPCB_DELETE_REMOTE", DEFAULT_DELETE_REMOTE);
 	        
 	        System.out.println("config: "+config);
 	        System.out.println("key: "+key);
 	        System.out.println("folder: "+folder);
 	        System.out.println("tempFolder: "+tempFolder);
 	        System.out.println("remoteFolder: "+remoteFolder);
+	        System.out.println("deleteRemote: "+deleteRemote);
 
 			PCloudConfig.setConfigFilename(config);
 			Utils.setTempFolder(tempFolder);
 
-			PGPCloudBackup app = new PGPCloudBackup(Paths.get(key), Paths.get(folder), Paths.get(remoteFolder));
+			PGPCloudBackup app = new PGPCloudBackup(Paths.get(key), Paths.get(folder), Paths.get(remoteFolder), deleteRemote);
 			app.startBackup();
 		}
 		catch (Exception e) {
@@ -95,9 +96,18 @@ public class PGPCloudBackupMain {
 
 	private static String getValue(CommandLine cmd, String cliName, String envName, String defaultValue) {
 		String result = System.getenv(envName);
-		if (result == null) {
-			result = cmd.getOptionValue(cliName, defaultValue);
+		if (result != null) {
+			return result;
 		}
-		return result;
+		return cmd.getOptionValue(cliName, defaultValue);
 	}	
+
+	private static boolean getBooleanValue(CommandLine cmd, String cliName, String envName, boolean defaultValue) {
+		String result = System.getenv(envName);
+		if (result != null) {
+			return Boolean.parseBoolean(result);
+		}			
+		return cmd.hasOption(cliName) || defaultValue;
+	}
+
 }

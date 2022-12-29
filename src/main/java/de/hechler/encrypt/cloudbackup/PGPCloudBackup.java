@@ -25,18 +25,20 @@ public class PGPCloudBackup {
 	private Path publicEncryptionKey;
 	private Path pathToBackup;
 	private Path remoteBaseFolder;
-	
-	private Map<String, String> filename2hashMap;
-	private Set<String> updatedFiles;
+	private boolean deleteRemote;
 	
 	Encrypter encrypter;
 	PCloudUploader uploader;
 	PCloudDeleter deleter;
 	
-	public PGPCloudBackup(Path publicEncryptionKey, Path pathToBackup, Path remoteBaseFolder) {
+	private Map<String, String> filename2hashMap;
+	private Set<String> updatedFiles;
+	
+	public PGPCloudBackup(Path publicEncryptionKey, Path pathToBackup, Path remoteBaseFolder, boolean deleteRemote) {
 		this.publicEncryptionKey = publicEncryptionKey;
 		this.pathToBackup = pathToBackup;
 		this.remoteBaseFolder = remoteBaseFolder;
+		this.deleteRemote = deleteRemote;
 		this.encrypter = new Encrypter(this.publicEncryptionKey);
 		this.uploader = new PCloudUploader();
 		this.deleter = new PCloudDeleter();
@@ -114,6 +116,13 @@ public class PGPCloudBackup {
 		Set<String> deletedFiles = new LinkedHashSet<>(filename2hashMap.keySet());
 		deletedFiles.removeAll(updatedFiles);
 
+		if (!deleteRemote) {
+			if (deletedFiles.size() > 0) {
+				System.out.println();
+				System.out.println("[NOT deleting " + deletedFiles.size() + " remote files, option -d was not set]");
+			}
+			return;
+		}
 		System.out.println();
 		System.out.println("[deleting " + deletedFiles.size() + " remote files ]");
 		for (String deletedFile:deletedFiles) {

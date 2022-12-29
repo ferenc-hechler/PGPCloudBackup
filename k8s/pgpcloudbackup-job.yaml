@@ -12,7 +12,8 @@ spec:
             args: [ "echo waiting 1h;
             sleep 3600;
             echo finished"]
-            imagePullPolicy: IfNotPresent
+            #imagePullPolicy: IfNotPresent
+            imagePullPolicy: Always
             env:
             - name: PGPCB_CONFIG_FILE
               value: "/app/conf/.pcloud-config"
@@ -23,7 +24,9 @@ spec:
             - name: PGPCB_TEMP_FOLDER
               value: "/tmp"
             - name: PGPCB_REMOTE_FOLDER
-              value: "/VSERVERBACKUP/mc-forge-1-12"
+              value: "/VSERVERBACKUP/minecraft"
+            - name: PGPCB_DELETE_REMOTE
+              value: "true"
             volumeMounts:
             - mountPath: /input
               name: input
