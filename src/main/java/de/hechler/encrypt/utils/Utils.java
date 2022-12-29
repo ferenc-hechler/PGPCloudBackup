@@ -24,6 +24,13 @@ public class Utils {
 		return result;
 	}
 	
+	public static String noPGP(String filename) {
+		if (filename.endsWith(".pgp")) {
+			return filename.substring(0, filename.length()-4);
+		}
+		return filename+"?.pgp?";
+	}
+	
 	public static String calcFileSHA256(Path inputFile) {
 		try {
 			ChecksumInputStream cin = new ChecksumInputStream("SHA-256", new FileInputStream(inputFile.toFile()));

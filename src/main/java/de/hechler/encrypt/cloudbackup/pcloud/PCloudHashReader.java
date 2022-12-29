@@ -103,6 +103,7 @@ public class PCloudHashReader {
 				}
 			}
 			filename2hashMap.put(fullPath, hash);
+			System.out.println("  o "+Utils.noPGP(fullPath));
 		} catch (IOException e) {
 			throw new RuntimeException(e.toString(), e);
 		}

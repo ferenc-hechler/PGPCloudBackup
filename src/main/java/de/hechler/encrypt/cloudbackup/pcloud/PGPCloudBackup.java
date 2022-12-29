@@ -45,28 +45,18 @@ public class PGPCloudBackup {
 		cleanupDeletedFiles();
 	}
 	
-	private void cleanupDeletedFiles() {
-		Set<String> deletedFiles = new LinkedHashSet<>(filename2hashMap.keySet());
-		deletedFiles.removeAll(updatedFiles);
-		System.out.println("[deleting " + deletedFiles.size() + " remote files ]");
-		for (String deletedFile:deletedFiles) {
-			System.out.println("  "+deletedFile);
-			deleter.deleteFile(Paths.get(deletedFile));
-		}
-	}
-
 	public void readRemoteFiles() {
+		System.out.println();
+		System.out.println("[reading remote files from "+Utils.rPath(remoteBaseFolder)+"]");
 		PCloudHashReader reader = new PCloudHashReader();
 		// optimization: cache results in file and only do update missing files
 		filename2hashMap = reader.readRecursive(remoteBaseFolder);
 		updatedFiles = new LinkedHashSet<>();
-		System.out.println("[current files in cloud backup]");
-		for (String filename:filename2hashMap.keySet()) {
-			System.out.println("  "+ filename);
-		}
 	}
 	
 	public void backupFiles() {
+		System.out.println();
+		System.out.println("[uploading files from "+Utils.rPath(pathToBackup)+"]");
 		recursiveBackupFolder(pathToBackup, remoteBaseFolder);
 	}
 
@@ -81,13 +71,13 @@ public class PGPCloudBackup {
 
 	private void backupFile(Path localFile, Path remoteFolder) {
 		try {
-			String remoteFilename = rPath(remoteFolder.resolve(localFile.getFileName()))+".pgp";
+			String remoteFilename = Utils.rPath(remoteFolder.resolve(localFile.getFileName()))+".pgp";
 			String remoteSHA256 = filename2hashMap.get(remoteFilename);
 			String sha256 = null;
 			if (remoteSHA256 != null) {
 				sha256 = Utils.calcFileSHA256(localFile);
 				if (remoteSHA256.equals(sha256)) {
-					System.out.println("SKIPING: "+remoteFilename);
+					System.out.println("  ~ "+Utils.noPGP(remoteFilename));
 					updatedFiles.add(remoteFilename);
 					return;
 				}
@@ -106,10 +96,9 @@ public class PGPCloudBackup {
 			if (encrypter.getKeyName() != null) {
 				comment += "\nkey=" + encrypter.getKeyName();
 			}
+			System.out.println("  + "+Utils.noPGP(remoteFilename));
 			Path tempFile = Utils.getTempPath();
-			System.out.println("ENCRYPTING: "+remoteFilename);
 			encrypter.encrypt(localFile, tempFile, comment);
-			System.out.println("  - uploading");
 			uploader.uploadFile(tempFile, Paths.get(remoteFilename));
 			updatedFiles.add(remoteFilename);
 		}
@@ -118,13 +107,17 @@ public class PGPCloudBackup {
 		}
 	}
 
-	
-	public static String rPath(Path folder) {
-		String result = folder.toString().replace('\\', '/');
-		if (!result.startsWith("/")) {
-			result = "/"+result;
+	private void cleanupDeletedFiles() {
+		Set<String> deletedFiles = new LinkedHashSet<>(filename2hashMap.keySet());
+		deletedFiles.removeAll(updatedFiles);
+
+		System.out.println();
+		System.out.println("[deleting " + deletedFiles.size() + " remote files ]");
+		for (String deletedFile:deletedFiles) {
+			System.out.println("  - "+Utils.noPGP(deletedFile));
+			deleter.deleteFile(Paths.get(deletedFile));
 		}
-		return result;
 	}
+
 
 }
