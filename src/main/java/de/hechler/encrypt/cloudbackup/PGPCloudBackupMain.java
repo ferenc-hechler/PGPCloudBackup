@@ -21,11 +21,17 @@ import de.hechler.encrypt.utils.Utils;
 
 public class PGPCloudBackupMain {
 
-	private static String DEFAULT_CONFIG = "DONOTCHECKIN/.pcloud-config";
-	private static String DEFAULT_KEY = "encrypt-key.pub";
-	private static String DEFAULT_FOLDER = "./testdata";
+	private static String DEFAULT_CONFIG = "conf/.pcloud-config";
+	private static String DEFAULT_KEY = "conf/encrypt-key.pub";
+	private static String DEFAULT_FOLDER = "/input";
 	private static String DEFAULT_TEMP_FOLDER = System.getProperty("java.io.tmpdir");
-	private static String DEFAULT_REMOTE_FOLDER = "/VSERVERBACKUP";
+	private static String DEFAULT_REMOTE_FOLDER = "/VSERVERBACKUP/TEST";
+
+//	private static String DEFAULT_CONFIG = "DONOTCHECKIN/.pcloud-config";
+//	private static String DEFAULT_KEY = "encrypt-key.pub";
+//	private static String DEFAULT_FOLDER = "./testdata";
+//	private static String DEFAULT_TEMP_FOLDER = System.getProperty("java.io.tmpdir");
+//	private static String DEFAULT_REMOTE_FOLDER = "/VSERVERBACKUP/TEST";
 	
 	public static void main(String[] args) {
 		try {

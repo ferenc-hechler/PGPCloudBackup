@@ -40,7 +40,13 @@ public class PCloudHashReader {
 			RemoteFolder rFolder = PCloudApiClient.getApiClient().listFolder(Utils.rPath(folder), true).execute();
 			readRecursive(folder, rFolder);
 			return filename2hashMap;
-		} catch (ApiError | IOException e) {
+		} catch (ApiError e) {
+			if (e.errorCode() == 2005) {
+				System.out.println("Remote folder "+folder+" does not yet exist.");
+				return new LinkedHashMap<>();
+			}
+			throw new RuntimeException(e.toString(), e);
+		} catch (IOException e) {
 			throw new RuntimeException(e.toString(), e);
 		}
 	}
