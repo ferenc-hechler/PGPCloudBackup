@@ -5,10 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import de.hechler.encrypt.pgp.Encrypter;
-import de.hechler.encrypt.pgp.Encrypter.EncryptResult;
 import de.hechler.encrypt.utils.Utils;
 
 /**
@@ -23,27 +24,42 @@ public class PGPCloudBackup {
 	private Path remoteBaseFolder;
 	
 	private Map<String, String> filename2hashMap;
-	PCloudUploader uploader;
+	private Set<String> updatedFiles;
+	
 	Encrypter encrypter;
+	PCloudUploader uploader;
+	PCloudDeleter deleter;
 	
 	public PGPCloudBackup(Path publicEncryptionKey, Path pathToBackup, Path remoteBaseFolder) {
 		this.publicEncryptionKey = publicEncryptionKey;
 		this.pathToBackup = pathToBackup;
 		this.remoteBaseFolder = remoteBaseFolder;
-		this.uploader = new PCloudUploader();
 		this.encrypter = new Encrypter(this.publicEncryptionKey);
+		this.uploader = new PCloudUploader();
+		this.deleter = new PCloudDeleter();
 	}
 	
 	public void startBackup() {
 		readRemoteFiles();
 		backupFiles();
-		// cleanupUnreferencedFiles();
+		cleanupDeletedFiles();
 	}
 	
+	private void cleanupDeletedFiles() {
+		Set<String> deletedFiles = new LinkedHashSet<>(filename2hashMap.keySet());
+		deletedFiles.removeAll(updatedFiles);
+		System.out.println("[deleting " + deletedFiles.size() + " remote files ]");
+		for (String deletedFile:deletedFiles) {
+			System.out.println("  "+deletedFile);
+			deleter.deleteFile(Paths.get(deletedFile));
+		}
+	}
+
 	public void readRemoteFiles() {
 		PCloudHashReader reader = new PCloudHashReader();
 		// optimization: cache results in file and only do update missing files
 		filename2hashMap = reader.readRecursive(remoteBaseFolder);
+		updatedFiles = new LinkedHashSet<>();
 		System.out.println("[current files in cloud backup]");
 		for (String filename:filename2hashMap.keySet()) {
 			System.out.println("  "+ filename);
@@ -72,6 +88,7 @@ public class PGPCloudBackup {
 				sha256 = Utils.calcFileSHA256(localFile);
 				if (remoteSHA256.equals(sha256)) {
 					System.out.println("SKIPING: "+remoteFilename);
+					updatedFiles.add(remoteFilename);
 					return;
 				}
 			}
@@ -94,6 +111,7 @@ public class PGPCloudBackup {
 			encrypter.encrypt(localFile, tempFile, comment);
 			System.out.println("  - uploading");
 			uploader.uploadFile(tempFile, Paths.get(remoteFilename));
+			updatedFiles.add(remoteFilename);
 		}
 		catch (IOException e) {
 			throw new RuntimeException("error creating backup for "+localFile+": "+e.toString(), e);
