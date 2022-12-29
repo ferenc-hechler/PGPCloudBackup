@@ -36,6 +36,7 @@ public class Utils {
 			ChecksumInputStream cin = new ChecksumInputStream("SHA-256", new FileInputStream(inputFile.toFile()));
 			byte[] buf = new byte[32768];
 			while (cin.read(buf) > 0) {}
+			cin.close();
 			return cin.getMD();
 		} catch (IOException e) {
 			throw new RuntimeException(e.toString(), e);

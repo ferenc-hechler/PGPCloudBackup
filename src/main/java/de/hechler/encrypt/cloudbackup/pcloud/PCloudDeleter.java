@@ -5,10 +5,6 @@ import java.nio.file.Path;
 
 import com.pcloud.sdk.ApiClient;
 import com.pcloud.sdk.ApiError;
-import com.pcloud.sdk.DataSource;
-import com.pcloud.sdk.RemoteFile;
-import com.pcloud.sdk.RemoteFolder;
-import com.pcloud.sdk.UploadOptions;
 
 import de.hechler.encrypt.utils.Utils;
 
