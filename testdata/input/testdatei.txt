@@ -1,0 +1,6 @@
+Das ist eine Testdatei, die verschlüsselt werden soll.
+und noch ein bisschen mehr text
+
+das wars.
+
+Letztes Update: 27.12.2022

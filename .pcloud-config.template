@@ -1,0 +1,4 @@
+CLIENT_ID=<client-id>
+CLIENT_SECRET=<client-secret>
+ACCESS_TOKEN=<access-token>
+API_HOST=eapi.pcloud.com
