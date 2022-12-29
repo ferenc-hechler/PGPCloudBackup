@@ -61,12 +61,12 @@ public class PGPCloudBackupMain {
 	            System.exit(1);
 	        }
 
-	        String config = cmd.getOptionValue("config", DEFAULT_CONFIG);
-	        String key = cmd.getOptionValue("key", DEFAULT_KEY);
-	        String folder = cmd.getOptionValue("folder", DEFAULT_FOLDER);
-	        String tempFolder = cmd.getOptionValue("temp-folder", DEFAULT_TEMP_FOLDER);
-	        String remoteFolder = cmd.getOptionValue("remote-folder", DEFAULT_REMOTE_FOLDER);
-
+	        String config       = getValue(cmd, "config",        "PGPCB_CONFIG_FILE",         DEFAULT_CONFIG);
+	        String key          = getValue(cmd, "key",           "PGPCB_PUBLIC_PGP_KEY_FILE", DEFAULT_KEY);
+	        String folder       = getValue(cmd, "folder",        "PGPCB_LOCAL_FOLDER",        DEFAULT_FOLDER);
+	        String tempFolder   = getValue(cmd, "temp-folder",   "PGPCB_TEMP_FOLDER",         DEFAULT_TEMP_FOLDER);
+	        String remoteFolder = getValue(cmd, "remote-folder", "PGPCB_REMOTE_FOLDER",       DEFAULT_REMOTE_FOLDER);
+	        
 	        System.out.println("config: "+config);
 	        System.out.println("key: "+key);
 	        System.out.println("folder: "+folder);
@@ -85,5 +85,13 @@ public class PGPCloudBackupMain {
 			System.exit(1);
 		}
 		PCloudApiClient.shutdownApiClient();
+	}
+
+	private static String getValue(CommandLine cmd, String cliName, String envName, String defaultValue) {
+		String result = System.getenv(envName);
+		if (result == null) {
+			result = cmd.getOptionValue(cliName, defaultValue);
+		}
+		return result;
 	}	
 }
