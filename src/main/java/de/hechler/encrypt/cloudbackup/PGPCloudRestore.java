@@ -20,8 +20,6 @@ import de.hechler.encrypt.utils.Utils;
 
 public class PGPCloudRestore {
 
-	private Path privateDecryptionKey;
-	private String passphrase;
 	private Path pathToRestore;
 	private Path remoteBaseFolder;
 	private boolean deleteLocal;
@@ -33,12 +31,10 @@ public class PGPCloudRestore {
 	private Set<String> existingFiles;
 	
 	public PGPCloudRestore(Path privateDecryptionKey, String passphrase, Path pathToRestore, Path remoteBaseFolder, boolean deleteLocal) {
-		this.privateDecryptionKey = privateDecryptionKey;
-		this.passphrase = passphrase;
+		this.decrypter = new Decrypter(privateDecryptionKey, passphrase);
 		this.pathToRestore = pathToRestore;
 		this.remoteBaseFolder = remoteBaseFolder;
 		this.deleteLocal = deleteLocal;
-		this.decrypter = new Decrypter(privateDecryptionKey, passphrase);
 		this.downloader = new PCloudDownloader();
 	}
 	

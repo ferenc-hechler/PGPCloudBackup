@@ -32,6 +32,7 @@ public class PGPCloudRestoreMain {
 
 	public static void main(String[] args) {
 		try {
+			System.out.println("PGPCloudRestore started");
 	        CommandLine cmd = null;
 	        Options options = new Options();
 	        try {
@@ -106,6 +107,7 @@ public class PGPCloudRestoreMain {
 
 			PGPCloudRestore app = new PGPCloudRestore(Paths.get(key), passphrase, Paths.get(folder), Paths.get(remoteFolder), deleteLocal);
 			app.startRestore();
+			System.out.println("PGPCloudRestore finished");
 		}
 		catch (Exception e) {
 			e.printStackTrace();

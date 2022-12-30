@@ -30,6 +30,7 @@ public class PGPCloudBackupMain {
 
 	public static void main(String[] args) {
 		try {
+			System.out.println("PGPCloudBackup started");
 	        CommandLine cmd = null;
 	        Options options = new Options();
 	        try {
@@ -85,6 +86,7 @@ public class PGPCloudBackupMain {
 
 			PGPCloudBackup app = new PGPCloudBackup(Paths.get(key), Paths.get(folder), Paths.get(remoteFolder), deleteRemote);
 			app.startBackup();
+			System.out.println("PGPCloudBackup finished");
 		}
 		catch (Exception e) {
 			e.printStackTrace();
