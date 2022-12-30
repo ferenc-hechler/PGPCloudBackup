@@ -35,13 +35,13 @@ public class PCloudHashReader {
 		this.filename2hashMap = new LinkedHashMap<>();
 	}
 
-	public Map<String, String> readRecursive(Path folder) {
+	public Map<String, String> readRecursive(Path folder, boolean mustExist) {
 		try {
 			RemoteFolder rFolder = PCloudApiClient.getApiClient().listFolder(Utils.rPath(folder), true).execute();
 			readRecursive(folder, rFolder);
 			return filename2hashMap;
 		} catch (ApiError e) {
-			if (e.errorCode() == 2005) {
+			if ((e.errorCode() == 2005) && !mustExist) {
 				System.out.println("Remote folder "+folder+" does not yet exist.");
 				return new LinkedHashMap<>();
 			}
@@ -118,7 +118,7 @@ public class PCloudHashReader {
 	
 	public static void main(String[] args) {
 		PCloudHashReader reader = new PCloudHashReader();
-		reader.readRecursive(Paths.get("/"));
+		reader.readRecursive(Paths.get("/"), false);
 
 	}
 	

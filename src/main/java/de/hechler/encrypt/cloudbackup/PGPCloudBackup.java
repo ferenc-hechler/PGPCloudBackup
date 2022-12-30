@@ -55,7 +55,7 @@ public class PGPCloudBackup {
 		System.out.println("[reading remote files from "+Utils.rPath(remoteBaseFolder)+"]");
 		PCloudHashReader reader = new PCloudHashReader();
 		// optimization: cache results in file and only do update missing files
-		filename2hashMap = reader.readRecursive(remoteBaseFolder);
+		filename2hashMap = reader.readRecursive(remoteBaseFolder, false);
 		updatedFiles = new LinkedHashSet<>();
 	}
 	
