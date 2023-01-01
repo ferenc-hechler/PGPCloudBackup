@@ -10,4 +10,6 @@ COPY target/pgpcloudbackup-jar-with-dependencies.jar /app/pgpcloudbackup.jar
 
 VOLUME /backup
 
+USER root:root
+
 CMD /app/pgp-cloud-backup.sh 
