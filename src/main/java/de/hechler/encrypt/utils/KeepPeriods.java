@@ -65,13 +65,13 @@ public class KeepPeriods {
 		return Integer.toString(n);
 	}
 	
-	public List<String> filterRemove(List<String> dates) {
+	public List<String> filterRemove(Collection<String> dates) {
 		Set<String> result = new HashSet<>(dates);
 		result.removeAll(filterKeep(dates));
 		return sort(result);
 	}
 
-	public List<String> filterKeep(List<String> dates) {
+	public List<String> filterKeep(Collection<String> dates) {
 		List<String> dayDates = new ArrayList<>();
 		List<String> weekDates = new ArrayList<>();
 		List<String> monthDates = new ArrayList<>();
