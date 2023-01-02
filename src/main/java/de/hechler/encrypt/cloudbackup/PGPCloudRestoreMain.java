@@ -28,6 +28,7 @@ public class PGPCloudRestoreMain {
 	static String DEFAULT_FOLDER = "/input";
 	static String DEFAULT_TEMP_FOLDER = System.getProperty("java.io.tmpdir");
 	static String DEFAULT_REMOTE_FOLDER = "/VSERVERBACKUP/TEST";
+	static String DEFAULT_FILTER_DATE = "";
 	static boolean DEFAULT_DELETE_LOCAL = false;
 
 	public static void main(String[] args) {
@@ -60,6 +61,10 @@ public class PGPCloudRestoreMain {
 		        tempFolderOpt.setRequired(false);
 		        options.addOption(tempFolderOpt);
 	
+		        Option filterDateOpt = new Option("F", "filter-date", true, "only restore files with the given timestamp in YYYY-MM-DD format, default is \""+DEFAULT_TEMP_FOLDER+"\"");
+		        filterDateOpt.setRequired(false);
+		        options.addOption(filterDateOpt);
+	
 		        Option remoteFolderOpt = new Option("r", "remote-folder", true, "backup pCloud folder which will be used as source for restoring, default is \""+DEFAULT_REMOTE_FOLDER+"\"");
 		        remoteFolderOpt.setRequired(false);
 		        options.addOption(remoteFolderOpt);
@@ -89,14 +94,25 @@ public class PGPCloudRestoreMain {
 	        String folder       = getValue(cmd, "folder",        "PGPCB_LOCAL_FOLDER",         DEFAULT_FOLDER);
 	        String tempFolder   = getValue(cmd, "temp-folder",   "PGPCB_TEMP_FOLDER",          DEFAULT_TEMP_FOLDER);
 	        String remoteFolder = getValue(cmd, "remote-folder", "PGPCB_REMOTE_FOLDER",        DEFAULT_REMOTE_FOLDER);
+	        String filterDate   = getValue(cmd, "filter-date",   "PGPCB_FILTER:DATE",          DEFAULT_FILTER_DATE);
 	        boolean deleteLocal = getBooleanValue(cmd, "delete-remote", "PGPCB_DELETE_LOCAL",  DEFAULT_DELETE_LOCAL);
 
+	        if (!filterDate.isEmpty()) {
+	        	if (!filterDate.matches("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]")) {
+		        	throw new RuntimeException("invalid filter-date '"+filterDate+"', format is YYYY-MM-DD");
+	        	}
+	        	if (deleteLocal) {
+	        		throw new RuntimeException("filter-date can not be combined with delete-local");
+	        	}
+	        }
+	        
 	        System.out.println("config: "+config);
 	        System.out.println("key: "+key);
 	        System.out.println("passphrase: ****");
 	        System.out.println("folder: "+folder);
 	        System.out.println("tempFolder: "+tempFolder);
 	        System.out.println("remoteFolder: "+remoteFolder);
+	        System.out.println("filterDate: "+filterDate);
 	        System.out.println("deleteLocal: "+deleteLocal);
 
         	String passphrase = SimpleCrypto.decrypt("ReStoReStoRe" + 32, encPassphrase);
@@ -105,7 +121,7 @@ public class PGPCloudRestoreMain {
 			PCloudConfig.setConfigFilename(config);
 			Utils.setTempFolder(tempFolder);
 
-			PGPCloudRestore app = new PGPCloudRestore(Paths.get(key), passphrase, Paths.get(folder), Paths.get(remoteFolder), deleteLocal);
+			PGPCloudRestore app = new PGPCloudRestore(Paths.get(key), passphrase, Paths.get(folder), Paths.get(remoteFolder), filterDate, deleteLocal);
 			app.startRestore();
 			System.out.println("PGPCloudRestore finished");
 		}

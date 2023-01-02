@@ -7,7 +7,17 @@ import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Utils {
+
+	private static final String TIMESTAMP_PATTERN = "^.*-([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9])[.][^/]*$";
 	
+	public static String extractTimestamp(String filename) {
+		if (!filename.matches(TIMESTAMP_PATTERN)) {
+			return null;
+		}
+		return filename.replaceFirst(TIMESTAMP_PATTERN, "$1");
+	}
+	
+
 	public static String bytes2hex(byte[] bytes) {
 		StringBuilder result = new StringBuilder();
 		for (byte b : bytes) {
@@ -54,5 +64,5 @@ public class Utils {
 	}
 	
 	
-	
+
 }

@@ -13,7 +13,7 @@ public class LocalPGPCloudBackupMain {
 		PGPCloudBackupMain.DEFAULT_FOLDER = "./testdata";
 		PGPCloudBackupMain.DEFAULT_TEMP_FOLDER = System.getProperty("java.io.tmpdir");
 		PGPCloudBackupMain.DEFAULT_REMOTE_FOLDER = "/VSERVERBACKUP/TEST";
-		PGPCloudBackupMain.DEFAULT_DELETE_REMOTE = false;
+		PGPCloudBackupMain.DEFAULT_DELETE_REMOTE = true;
 		PGPCloudBackupMain.main(args);
 	}
 

@@ -22,6 +22,7 @@ public class PGPCloudRestore {
 
 	private Path pathToRestore;
 	private Path remoteBaseFolder;
+	private String filterDate;
 	private boolean deleteLocal;
 	
 	Decrypter decrypter;
@@ -30,10 +31,11 @@ public class PGPCloudRestore {
 	private Map<String, String> filename2hashMap;
 	private Set<String> existingFiles;
 	
-	public PGPCloudRestore(Path privateDecryptionKey, String passphrase, Path pathToRestore, Path remoteBaseFolder, boolean deleteLocal) {
+	public PGPCloudRestore(Path privateDecryptionKey, String passphrase, Path pathToRestore, Path remoteBaseFolder, String filterDate, boolean deleteLocal) {
 		this.decrypter = new Decrypter(privateDecryptionKey, passphrase);
 		this.pathToRestore = pathToRestore;
 		this.remoteBaseFolder = remoteBaseFolder;
+		this.filterDate = filterDate;
 		this.deleteLocal = deleteLocal;
 		this.downloader = new PCloudDownloader();
 	}
@@ -99,12 +101,18 @@ public class PGPCloudRestore {
 	private void restoreFiles() {
 		String baseFolder = Utils.rPath(remoteBaseFolder);
 		System.out.println();
-		System.out.println("[restoring files from "+baseFolder+"]");
+		System.out.println("[restoring files from "+baseFolder+(filterDate.isEmpty()?"":" with time filter '"+filterDate+"'")+"]");
 		Set<String> filesToRestore = new LinkedHashSet<>(filename2hashMap.keySet());
 		filesToRestore.removeAll(existingFiles);
 		for (String fileToRestore:filesToRestore) {
 			if (!fileToRestore.startsWith(baseFolder)) {
 				throw new RuntimeException("unexpected filename "+fileToRestore+" should start with "+baseFolder);
+			}
+			if (!filterDate.isEmpty()) {
+				String timeStamp = Utils.extractTimestamp(fileToRestore);
+				if (!filterDate.equals(timeStamp)) {
+					continue;
+				}
 			}
 			restoreFile(fileToRestore, Utils.noPGP(fileToRestore.substring(baseFolder.length()+1)));
 		}

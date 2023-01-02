@@ -19,8 +19,6 @@ import de.hechler.encrypt.utils.Utils;
 
 public class PGPCloudHousekeeping {
 
-	private static final String TIMESTAMP_PATTERN = "^.*-([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9])[.][^/]*$";
-	
 	private Path remoteBaseFolder;
 	private String keepPeriodsPattern;
 	private boolean ignoreMissingTimestamps;
@@ -52,17 +50,16 @@ public class PGPCloudHousekeeping {
 		filenames = reader.readRecursive(remoteBaseFolder);
 	}
 	
-
 	private void collectTimestamps() {
 		timestamps = new LinkedHashSet<>();
 		for (String filename:filenames) {
-			if (!filename.matches(TIMESTAMP_PATTERN)) {
+			String timestamp = Utils.extractTimestamp(filename);
+			if (timestamp == null) {
 				if (ignoreMissingTimestamps) {
 					continue;
 				}
 				throw new RuntimeException("Remote file without timestamp found: '"+filename+"'");
 			}
-			String timestamp = filename.replaceFirst(TIMESTAMP_PATTERN, "$1");
 			timestamps.add(timestamp);
 		}
 	}
@@ -75,10 +72,10 @@ public class PGPCloudHousekeeping {
 		System.out.println("removing: "+removeDates);
 		System.out.println("[remote files]");
 		for (String filename:filenames) {
-			if (!filename.matches(TIMESTAMP_PATTERN)) {
+			String timestamp = Utils.extractTimestamp(filename);
+			if (timestamp == null) {
 				continue;
 			}
-			String timestamp = filename.replaceFirst(TIMESTAMP_PATTERN, "$1");
 			if (removeDates.contains(timestamp)) {
 				System.out.println("  - "+filename);
 				deleter.deleteFile(Paths.get(filename));
